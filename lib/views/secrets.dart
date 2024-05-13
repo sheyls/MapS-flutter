@@ -1,5 +1,5 @@
 class Secrets {
-  static const API_KEY = "AIzaSyBXzgiA94YlOsq4n-gPtpidow8P8ztP2zk";
+  static const API_KEY = "";
 }
 
 class BaseUrl{
