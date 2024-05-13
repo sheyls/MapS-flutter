@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:MapS/views/secrets.dart';
+
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -12,7 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _handleLogin() async {
-    final url = Uri.parse('http://192.168.33.8:8001/api/login'); 
+    final url = Uri.parse('${BaseUrl.URL}/api/login'); 
 
     try {
       final response = await http.post(
@@ -45,29 +47,51 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
-    // El resto del código de tu widget no cambia
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
-        title: Text('Login'),
-      ),
-      body: Center(
-        child: Column(
+        backgroundColor: Colors.green,  // AppBar color
+        title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Image.asset(
+              'assets/images/logo.png',
+              fit: BoxFit.contain,
+              height: 32,
+            ),
+            Container(padding: const EdgeInsets.all(8.0), child: Text('MapS')),
+          ],
+        ),
+      ),
+      body: Container(
+        padding: EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
             TextField(
               controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email, color: Colors.green),
+              ),
             ),
+            SizedBox(height: 20.0),
             TextField(
               controller: _passwordController,
+              decoration: InputDecoration(
+                labelText: 'Password',
+                prefixIcon: Icon(Icons.lock, color: Colors.green),
+              ),
               obscureText: true,
-              decoration: InputDecoration(labelText: 'Password'),
             ),
+            SizedBox(height: 20.0),
             ElevatedButton(
               onPressed: _handleLogin,
+              style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white
+            ),
               child: Text('Login'),
             ),
           ],

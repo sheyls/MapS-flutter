@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:MapS/views/secrets.dart';  // Asegúrate de que este archivo maneje bien las claves
+import 'package:MapS/views/secrets.dart';
 import 'dart:convert';
 
 class MapScreen extends StatefulWidget {
@@ -15,6 +15,8 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? currentLocation;
   Marker? currentMarker;
   String? formattedAddress;
+  String? region;
+  String? comuna;
 
   @override
   void initState() {
@@ -84,8 +86,10 @@ class _MapScreenState extends State<MapScreen> {
     var response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=${newPosition.latitude},${newPosition.longitude}&key=${Secrets.API_KEY}'));
     var decoded = jsonDecode(response.body);
     if (decoded['results'].isNotEmpty) {
-      setState(() {
+       setState(() {
         formattedAddress = decoded['results'][0]['formatted_address'];
+        region = decoded['results'][0]['address_components'][3]['long_name'];
+        comuna = decoded['results'][0]['address_components'][2]['long_name'];
       });
     }
   }
@@ -96,9 +100,49 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+
+  Future<void> _saveLocation() async {
+    var url = Uri.parse('${BaseUrl.URL}/api/map'); 
+    try {
+      var response = await http.post(url, body: {
+        'latitude': currentLocation!.latitude.toString(),
+        'longitude': currentLocation!.longitude.toString(),
+        'name': 'Current Location', 
+        'description': formattedAddress ?? 'No description available',
+        'region': region ?? 'Unknown region', 
+        'comuna': comuna ?? 'Unknown comuna',
+      });
+
+      if (response.statusCode == 200) {
+        var data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Location saved successfully: ${data['message']}')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to save location: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      print('Caught error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error sending data: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('MapS'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: _saveLocation
+          ),
+        ],
+      ),
       body: currentLocation == null
           ? Center(child: CircularProgressIndicator())
           : GoogleMap(
@@ -111,6 +155,7 @@ class _MapScreenState extends State<MapScreen> {
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
             ),
+            
     );
   }
 }
