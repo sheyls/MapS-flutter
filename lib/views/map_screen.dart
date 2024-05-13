@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:MapS/views/secrets.dart';  
+import 'package:MapS/views/secrets.dart';  // Asegúrate de que este archivo maneje bien las claves
 import 'dart:convert';
 
 class MapScreen extends StatefulWidget {
@@ -14,7 +14,7 @@ class _MapScreenState extends State<MapScreen> {
   GoogleMapController? mapController;
   LatLng? currentLocation;
   Marker? currentMarker;
-  String? formattedAddress; // To store formatted address
+  String? formattedAddress;
 
   @override
   void initState() {
@@ -57,26 +57,31 @@ class _MapScreenState extends State<MapScreen> {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() {
       currentLocation = LatLng(position.latitude, position.longitude);
-      _updateMapLocation();
-    });
-  }
-
-  void _updateMapLocation() {
-    if (currentLocation != null) {
-      mapController?.moveCamera(CameraUpdate.newLatLng(currentLocation!));
       currentMarker = Marker(
         markerId: MarkerId('currentLocation'),
         position: currentLocation!,
         draggable: true,
-        onDragEnd: (newPosition) {
-          _updateAddress(newPosition);
-        },
+        onDragEnd: _onMarkerDragEnd,
       );
-    }
+    });
+  }
+
+  void _onMarkerDragEnd(LatLng newPosition) {
+    setState(() {
+      currentLocation = newPosition;
+      currentMarker = Marker(
+        markerId: MarkerId('currentLocation'),
+        position: newPosition,
+        draggable: true,
+        onDragEnd: _onMarkerDragEnd,
+      );
+      _updateAddress(newPosition);
+    });
+    mapController!.animateCamera(CameraUpdate.newLatLng(newPosition));
   }
 
   void _updateAddress(LatLng newPosition) async {
-    var response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=${newPosition.latitude},${newPosition.longitude}&key= ${Secrets.API_KEY}'));
+    var response = await http.get(Uri.parse('https://maps.googleapis.com/maps/api/geocode/json?latlng=${newPosition.latitude},${newPosition.longitude}&key=${Secrets.API_KEY}'));
     var decoded = jsonDecode(response.body);
     if (decoded['results'].isNotEmpty) {
       setState(() {
