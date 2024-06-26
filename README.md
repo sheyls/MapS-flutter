@@ -30,13 +30,16 @@ The MapS Flutter application provides interface to interact with geolocation dat
 
 - Login Screen: Allows users login and interacts with the API 
 
-![IMAGE 2024-05-13 18:28:51](https://github.com/sheyls/MapS-flutter/assets/70074598/48498055-339a-4e48-8d19-4623afdcfb5b)
+<p align="center">
+  <img src="https://github.com/sheyls/MapS-flutter/assets/70074598/48498055-339a-4e48-8d19-4623afdcfb5b" alt="IMAGE 2024-05-13 18:28:51" width="200"/>
+</p>
 
 - Real-time Location Tracking: View your current location on a Google map.
 - Marker Management: Drag and drop markers to update your location.
 
-![IMAGE 2024-05-13 18:28:52](https://github.com/sheyls/MapS-flutter/assets/70074598/77befa15-1288-4947-abe0-842e7fd02cbb)
-
+<p align="center">
+<img src="https://github.com/sheyls/MapS-flutter/assets/70074598/77befa15-1288-4947-abe0-842e7fd02cbb" alt="IMAGE 2024-05-13 18:28:52" width="200"/>
+</p>
   
 - Location Persistence: Save your current location, including additional details like region and comuna, to a remote database.
 
